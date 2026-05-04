@@ -10,6 +10,10 @@ import 'cache_store.dart';
 import 'http_downloader.dart';
 
 class ZeroCacheManager {
+  static const Set<String> defaultImageExtensions = {
+    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg',
+  };
+
   static ZeroCacheManager? _instance;
   static ZeroCacheManager get instance => _instance ??= ZeroCacheManager();
 
@@ -17,6 +21,8 @@ class ZeroCacheManager {
   static set instance(ZeroCacheManager manager) => _instance = manager;
 
   final int maxCacheSize;
+  final String cacheDirName;
+  final Set<String> extensionAllowlist;
   final int _evictionCheckInterval;
 
   CacheStore? _store;
@@ -27,6 +33,8 @@ class ZeroCacheManager {
 
   ZeroCacheManager({
     this.maxCacheSize = 500 * 1024 * 1024, // 500 MB
+    this.cacheDirName = 'zero_cached_image',
+    this.extensionAllowlist = defaultImageExtensions,
     int evictionCheckInterval = 100,
   }) : _evictionCheckInterval = evictionCheckInterval;
 
@@ -36,7 +44,7 @@ class ZeroCacheManager {
 
     try {
       final appDir = await getApplicationSupportDirectory();
-      _cacheDir = '${appDir.path}${Platform.pathSeparator}zero_cached_image';
+      _cacheDir = '${appDir.path}${Platform.pathSeparator}$cacheDirName';
       await Directory(_cacheDir!).create(recursive: true);
 
       _store = CacheStore('$_cacheDir${Platform.pathSeparator}index.json');
@@ -179,11 +187,7 @@ class ZeroCacheManager {
       final dot = path.lastIndexOf('.');
       if (dot == -1) return '';
       final ext = path.substring(dot).toLowerCase();
-      // Only keep common image extensions
-      if (const {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'}
-          .contains(ext)) {
-        return ext;
-      }
+      if (extensionAllowlist.contains(ext)) return ext;
     } catch (_) {}
     return '';
   }
