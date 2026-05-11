@@ -1,6 +1,6 @@
 name: zero_cached_image
 description: A minimal, high-performance cached network image widget. Zero-copy disk reads via ImmutableBuffer.fromFilePath, in-memory index, ETag support. Only 2 dependencies.
-version: 1.1.0
+version: 1.1.1
 homepage: https://github.com/0xjmsl/zero_cached_image
 repository: https://github.com/0xjmsl/zero_cached_image
 issue_tracker: https://github.com/0xjmsl/zero_cached_image/issues

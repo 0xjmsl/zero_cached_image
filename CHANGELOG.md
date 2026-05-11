@@ -1,3 +1,7 @@
+## 1.1.1
+
+- No code changes. Republish to drop an accidentally-included internal `CLAUDE.md` from the package contents.
+
 ## 1.1.0
 
 - `ZeroCacheManager` now accepts `cacheDirName` and `extensionAllowlist` constructor params. Defaults preserve 1.0.0 behavior (`zero_cached_image` dir, image-only extension allowlist). Enables sibling packages (e.g., `zero_cached_video`) to reuse the cache machinery with their own directory + media-type allowlist.
