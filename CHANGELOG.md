@@ -1,3 +1,7 @@
+## 1.2.0
+
+- `ZeroCacheManager.getCachedFilePath(url)` — cache-only lookup that returns the local file path if already cached, null on miss. Never downloads. Intended for latency-critical paths (background-isolate notification rendering, etc.) where a network round trip is not acceptable.
+
 ## 1.1.0
 
 - `ZeroCacheManager` now accepts `cacheDirName` and `extensionAllowlist` constructor params. Defaults preserve 1.0.0 behavior (`zero_cached_image` dir, image-only extension allowlist). Enables sibling packages (e.g., `zero_cached_video`) to reuse the cache machinery with their own directory + media-type allowlist.
