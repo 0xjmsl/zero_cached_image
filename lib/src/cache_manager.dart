@@ -25,6 +25,13 @@ class ZeroCacheManager {
   final Set<String> extensionAllowlist;
   final int _evictionCheckInterval;
 
+  /// Optional override of the root directory the cache lives under. When set,
+  /// the cache root becomes `<cacheRootOverride>/<cacheDirName>` instead of
+  /// `<getApplicationSupportDirectory()>/<cacheDirName>`. Useful for placing
+  /// the cache inside an iOS App Group container so a Notification Service
+  /// Extension can read the same files. Pass an absolute directory path.
+  final String? cacheRootOverride;
+
   CacheStore? _store;
   HttpDownloader? _downloader;
   String? _cacheDir;
@@ -35,6 +42,7 @@ class ZeroCacheManager {
     this.maxCacheSize = 500 * 1024 * 1024, // 500 MB
     this.cacheDirName = 'zero_cached_image',
     this.extensionAllowlist = defaultImageExtensions,
+    this.cacheRootOverride,
     int evictionCheckInterval = 100,
   }) : _evictionCheckInterval = evictionCheckInterval;
 
@@ -43,8 +51,14 @@ class ZeroCacheManager {
     _initCompleter = Completer<void>();
 
     try {
-      final appDir = await getApplicationSupportDirectory();
-      _cacheDir = '${appDir.path}${Platform.pathSeparator}$cacheDirName';
+      final String rootPath;
+      if (cacheRootOverride != null) {
+        rootPath = cacheRootOverride!;
+      } else {
+        final appDir = await getApplicationSupportDirectory();
+        rootPath = appDir.path;
+      }
+      _cacheDir = '$rootPath${Platform.pathSeparator}$cacheDirName';
       await Directory(_cacheDir!).create(recursive: true);
 
       _store = CacheStore('$_cacheDir${Platform.pathSeparator}index.json');
