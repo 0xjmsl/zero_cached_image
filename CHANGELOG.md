@@ -1,3 +1,7 @@
+## 1.3.0
+
+- `ZeroCacheManager` now accepts `cacheRootOverride` constructor param. When set, the cache lives at `<cacheRootOverride>/<cacheDirName>` instead of `<getApplicationSupportDirectory()>/<cacheDirName>`. Enables placing the cache inside an iOS App Group container so a Notification Service Extension running in a separate process can read the same files. Defaults to null (1.2.0 behavior preserved).
+
 ## 1.2.0
 
 - `ZeroCacheManager.getCachedFilePath(url)` — cache-only lookup that returns the local file path if already cached, null on miss. Never downloads. Intended for latency-critical paths (background-isolate notification rendering, etc.) where a network round trip is not acceptable.
