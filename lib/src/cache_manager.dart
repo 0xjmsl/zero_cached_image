@@ -120,6 +120,25 @@ class ZeroCacheManager {
     return result.filePath;
   }
 
+  /// Returns the local file path for [url] **only if it is already cached on
+  /// disk**, never downloads. Returns null on cache miss or if the entry's
+  /// file has been deleted out-of-band. Ignores expiry — callers that need a
+  /// fresh copy should use [getFilePath] instead.
+  ///
+  /// Intended for latency-critical paths that cannot afford a network round
+  /// trip (notification rendering in a background isolate, synchronous-feel
+  /// UI affordances, etc.).
+  Future<String?> getCachedFilePath(String url) async {
+    await init();
+    final entry = _store!.get(url);
+    if (entry == null) return null;
+    if (!File(entry.path).existsSync()) {
+      _store!.remove(url);
+      return null;
+    }
+    return entry.path;
+  }
+
   /// Evict a single URL from cache. Deletes file + index entry.
   Future<void> evict(String url) async {
     await init();
