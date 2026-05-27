@@ -1,3 +1,7 @@
+## 1.4.0
+
+- `ZeroCachedImage` now accepts `memCacheWidth` / `memCacheHeight` (physical pixels). When set, the image is decoded at (at most) that size via `ResizeImage` instead of its native resolution — crisp thumbnails/avatars (decoder area-resample beats GPU minification) with a much smaller in-memory bitmap. Aspect ratio is preserved; the disk cache still holds the full original. Web path forwards them to `Image.network`'s `cacheWidth`/`cacheHeight`. Defaults to null (1.3.0 behavior preserved).
+
 ## 1.3.0
 
 - `ZeroCacheManager` now accepts `cacheRootOverride` constructor param. When set, the cache lives at `<cacheRootOverride>/<cacheDirName>` instead of `<getApplicationSupportDirectory()>/<cacheDirName>`. Enables placing the cache inside an iOS App Group container so a Notification Service Extension running in a separate process can read the same files. Defaults to null (1.2.0 behavior preserved).

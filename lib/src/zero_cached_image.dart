@@ -21,6 +21,14 @@ class ZeroCachedImage extends StatefulWidget {
   final BlendMode? colorBlendMode;
   final FilterQuality filterQuality;
 
+  /// Decode the image at (at most) this width/height in **physical pixels**
+  /// instead of its native resolution. Pair with a small display box to render
+  /// crisp thumbnails/avatars — the decoder area-resamples down once (sharper
+  /// than GPU minification) and only the small bitmap is kept in memory. Null
+  /// (the default) decodes at native resolution. Aspect ratio is preserved.
+  final int? memCacheWidth;
+  final int? memCacheHeight;
+
   const ZeroCachedImage({
     super.key,
     required this.imageUrl,
@@ -37,6 +45,8 @@ class ZeroCachedImage extends StatefulWidget {
     this.color,
     this.colorBlendMode,
     this.filterQuality = FilterQuality.low,
+    this.memCacheWidth,
+    this.memCacheHeight,
   });
 
   /// Evict a single URL from the cache.
@@ -89,6 +99,8 @@ class _ZeroCachedImageState extends State<ZeroCachedImage>
         color: widget.color,
         colorBlendMode: widget.colorBlendMode,
         filterQuality: widget.filterQuality,
+        cacheWidth: widget.memCacheWidth,
+        cacheHeight: widget.memCacheHeight,
         errorBuilder: widget.errorWidget != null
             ? (context, error, _) =>
                 widget.errorWidget!(context, widget.imageUrl, error)
@@ -97,10 +109,14 @@ class _ZeroCachedImageState extends State<ZeroCachedImage>
     }
 
     return Image(
-      image: ZeroCachedImageProvider(
-        widget.imageUrl,
-        headers: widget.httpHeaders,
-        cacheManager: widget.cacheManager,
+      image: ResizeImage.resizeIfNeeded(
+        widget.memCacheWidth,
+        widget.memCacheHeight,
+        ZeroCachedImageProvider(
+          widget.imageUrl,
+          headers: widget.httpHeaders,
+          cacheManager: widget.cacheManager,
+        ),
       ),
       fit: widget.fit,
       width: widget.width,
