@@ -76,9 +76,14 @@ class ZeroCacheManager {
 
   /// Returns the local file path for [url], downloading if necessary.
   /// The returned path can be used with ImmutableBuffer.fromFilePath().
+  ///
+  /// [preAuth] sends the [ZeroFetchHooks.requestAuth] body on the first
+  /// attempt (for URLs the caller knows are gated) instead of waiting for
+  /// the server's 401 challenge.
   Future<String> getFilePath(
     String url, {
     Map<String, String>? headers,
+    bool preAuth = false,
   }) async {
     await init();
 
@@ -97,6 +102,7 @@ class ZeroCacheManager {
             entry.path,
             etag: entry.etag,
             headers: headers,
+            preAuth: preAuth,
           );
           if (result.notModified) {
             // Server confirmed still valid — update expiry
@@ -129,6 +135,7 @@ class ZeroCacheManager {
       url,
       destPath,
       headers: headers,
+      preAuth: preAuth,
     );
     _onDownloaded(url, result);
     return result.filePath;

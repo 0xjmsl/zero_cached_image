@@ -29,6 +29,13 @@ class ZeroCachedImage extends StatefulWidget {
   final int? memCacheWidth;
   final int? memCacheHeight;
 
+  /// Send the app's `ZeroFetchHooks.requestAuth` body on the first attempt —
+  /// for URLs the caller already knows are gated (skips the server's 401
+  /// challenge round trip). Gated URLs work without it too: the server
+  /// challenges, the fetch retries authenticated. No effect when no
+  /// `requestAuth` hook is installed.
+  final bool preAuth;
+
   const ZeroCachedImage({
     super.key,
     required this.imageUrl,
@@ -47,6 +54,7 @@ class ZeroCachedImage extends StatefulWidget {
     this.filterQuality = FilterQuality.low,
     this.memCacheWidth,
     this.memCacheHeight,
+    this.preAuth = false,
   });
 
   /// Evict a single URL from the cache.
@@ -116,6 +124,7 @@ class _ZeroCachedImageState extends State<ZeroCachedImage>
           widget.imageUrl,
           headers: widget.httpHeaders,
           cacheManager: widget.cacheManager,
+          preAuth: widget.preAuth,
         ),
       ),
       fit: widget.fit,

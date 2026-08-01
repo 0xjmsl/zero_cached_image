@@ -16,12 +16,19 @@ class ZeroCachedImageProvider
   final ZeroCacheManager? cacheManager;
   final void Function(Object)? errorListener;
 
+  /// Send the app's `ZeroFetchHooks.requestAuth` body on the FIRST attempt —
+  /// for URLs the caller already knows are gated (skips the 401 challenge
+  /// round trip). Without it, gated URLs still work: the server challenges,
+  /// the fetch retries authenticated.
+  final bool preAuth;
+
   const ZeroCachedImageProvider(
     this.url, {
     this.scale = 1.0,
     this.headers,
     this.cacheManager,
     this.errorListener,
+    this.preAuth = false,
   });
 
   ZeroCacheManager get _manager => cacheManager ?? ZeroCacheManager.instance;
@@ -68,6 +75,7 @@ class ZeroCachedImageProvider
       final filePath = await _manager.getFilePath(
         key.url,
         headers: key.headers,
+        preAuth: key.preAuth,
       );
 
       // Zero-copy: Flutter engine reads file directly into GPU-accessible memory
