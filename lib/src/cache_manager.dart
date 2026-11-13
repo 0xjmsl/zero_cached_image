@@ -160,6 +160,35 @@ class ZeroCacheManager {
     return entry.path;
   }
 
+  /// The path [url]'s file has (or will have) in this cache. For callers
+  /// that fill the file themselves (a streaming proxy writing while a player
+  /// reads) and then hand it over with [commit].
+  Future<String> pathFor(String url) async {
+    await init();
+    return _filePathForUrl(url);
+  }
+
+  /// Registers a file the caller wrote at [pathFor]([url]) as the cached copy
+  /// of [url], exactly as if [getFilePath] had downloaded it. [maxAge] and
+  /// [etag] come from the response the bytes came from.
+  Future<void> commit(
+    String url, {
+    required int size,
+    String? etag,
+    Duration? maxAge,
+  }) async {
+    await init();
+    _onDownloaded(
+      url,
+      DownloadResult(
+        filePath: _filePathForUrl(url),
+        etag: etag,
+        maxAge: maxAge,
+        size: size,
+      ),
+    );
+  }
+
   /// Evict a single URL from cache. Deletes file + index entry.
   Future<void> evict(String url) async {
     await init();

@@ -1,3 +1,7 @@
+## 1.5.0
+
+- `ZeroCacheManager.pathFor(url)` and `ZeroCacheManager.commit(url, size:, etag:, maxAge:)`: a caller that writes a cached file itself (a streaming proxy filling it while a player reads) gets the path the cache would use and then registers the finished file, exactly as if `getFilePath` had downloaded it.
+
 ## 1.4.0
 
 - `ZeroCachedImage` now accepts `memCacheWidth` / `memCacheHeight` (physical pixels). When set, the image is decoded at (at most) that size via `ResizeImage` instead of its native resolution — crisp thumbnails/avatars (decoder area-resample beats GPU minification) with a much smaller in-memory bitmap. Aspect ratio is preserved; the disk cache still holds the full original. Web path forwards them to `Image.network`'s `cacheWidth`/`cacheHeight`. Defaults to null (1.3.0 behavior preserved).
